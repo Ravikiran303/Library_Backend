@@ -21,7 +21,7 @@ app.get("/", (req, res) => {
 });
 
 app.get("/books", (req, res) => {
-  Books.find().exec(function(err, books) {
+  Books.find({}).exec(function(err, books) {
     if (err) {
       res.send("something is wrong");
     } else {
