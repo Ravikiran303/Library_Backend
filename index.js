@@ -29,5 +29,8 @@ app.get("/books", (req, res) => {
     }
   });
 });
+app.put("/book/:id/checkout", (req, res) => {
+  res.send(req.params.id);
+});
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
