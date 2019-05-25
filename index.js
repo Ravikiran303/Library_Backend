@@ -21,7 +21,7 @@ app.get("/", (req, res) => {
 });
 
 app.get("/books", (req, res) => {
-  Books.find({ checkout: "true" }).exec(function(err, books) {
+  Books.find({ available: "true" }).exec(function(err, books) {
     if (err) {
       res.send("something is wrong");
     } else {
@@ -29,10 +29,10 @@ app.get("/books", (req, res) => {
     }
   });
 });
-app.put("/book/:id/checkout", (req, res) => {
+app.put("/books/:id/checkout", (req, res) => {
   //res.send(req.params.id);
   var id = mongoose.Types.ObjectId(req.params.id);
-  Books.update({ _id: id }, { $set: { checkout: false } }, function(
+  Books.update({ _id: id }, { $set: { available: false } }, function(
     err,
     result
   ) {

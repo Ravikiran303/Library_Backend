@@ -5,7 +5,7 @@ const Books_Schema = new Schema({
   title: String,
   author: String,
   description: String,
-  checkout: {
+  available: {
     type: Boolean,
     default: true
   }
