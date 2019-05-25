@@ -30,7 +30,14 @@ app.get("/books", (req, res) => {
   });
 });
 app.put("/book/:id/checkout", (req, res) => {
-  res.send(req.params.id);
+  //res.send(req.params.id);
+  var id = mongoose.Types.ObjectId(req.params.id);
+  Books.update({ _id: id }, { $set: { checkout: false } }, function(
+    err,
+    result
+  ) {
+    res.send(result);
+  });
 });
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
