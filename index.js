@@ -4,7 +4,7 @@ const app = express();
 const port = 5000;
 
 var mongoose = require("mongoose");
-const mongoURI = "mongodb://localhost:27017/Books";
+const mongoURI = "mongodb://localhost:27017/Library";
 
 const Books = require("./models/Books");
 
