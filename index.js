@@ -1,15 +1,26 @@
 const express = require("express");
+const bcrypt = require("bcrypt");
 
 const app = express();
 const port = 5000;
 
 var mongoose = require("mongoose");
 const mongoURI = "mongodb://localhost:27017/Library";
+const bodyParser = require("body-parser");
+app.use(bodyParser.json());
+app.use(
+  bodyParser.urlencoded({
+    extended: false
+  })
+);
 
 const Books = require("./models/Books");
+const User = require("./models/User");
 
 const cors = require("cors");
 app.use(cors());
+
+process.env.SECRET_KEY = "secret";
 
 mongoose
   .connect(mongoURI, { useNewUrlParser: true })
@@ -39,5 +50,31 @@ app.put("/books/:id/checkout", (req, res) => {
     res.send(result);
   });
 });
+app.post("/register", (req, res) => {
+  const user = {
+    name: req.body.name,
+    email: req.body.email,
+    password: req.body.password
+  };
+  User.findOne({
+    email: req.body.email
+  }).then(newuser => {
+    if (!newuser) {
+      bcrypt.hash(req.body.password, 10, (err, hash) => {
+        user.password = hash;
+        User.create(user)
+          .then(newuser => {
+            res.json({ status: newuser.email + " registered" });
+          })
+          .catch(err => {
+            res.send(err);
+          });
+      });
+    } else {
+      res.json({ error: "already registered" });
+    }
+  });
+});
+app.post("/login", (req, res) => {});
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
