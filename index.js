@@ -1,11 +1,13 @@
 const express = require("express");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
 const app = express();
 const port = 5000;
 
 var mongoose = require("mongoose");
 const mongoURI = "mongodb://localhost:27017/Library";
+
 const bodyParser = require("body-parser");
 app.use(bodyParser.json());
 app.use(
@@ -50,7 +52,7 @@ app.put("/books/:id/checkout", (req, res) => {
     res.send(result);
   });
 });
-app.post("/register", (req, res) => {
+app.post("/user/register", (req, res) => {
   const user = {
     name: req.body.name,
     email: req.body.email,
@@ -75,6 +77,29 @@ app.post("/register", (req, res) => {
     }
   });
 });
-app.post("/login", (req, res) => {});
+app.post("/user/login", (req, res) => {
+  User.findOne({
+    email: req.body.email
+  })
+    .then(user => {
+      if (bcrypt.compareSync(req.body.password, user.password)) {
+        //res.send(req.body.password);
+        //res.send(user.password);
+        const payload = {
+          _id: user._id,
+          email: user.email
+        };
+        let token = jwt.sign(payload, process.env.SECRET_KEY, {
+          expiresIn: 3220
+        });
+        res.send(token);
+      } else {
+        res.json({ error: "User does not exist" });
+      }
+    })
+    .catch(err => {
+      res.send("error" + err);
+    });
+});
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
