@@ -18,6 +18,7 @@ app.use(
 
 const Books = require("./models/Books");
 const User = require("./models/User");
+const Checkout = require("./models/Checkout");
 
 const cors = require("cors");
 app.use(cors());
@@ -42,17 +43,33 @@ app.get("/books", (req, res) => {
     }
   });
 });
-app.put("/books/:id/checkout", (req, res) => {
-  //res.send(req.params.id);
+app.put("/books/:id/checkout/:user", (req, res) => {
   var id = mongoose.Types.ObjectId(req.params.id);
-  Books.update({ _id: id }, { $set: { available: false } }, function(
+  Books.updateOne({ _id: id }, { $set: { available: false } }, function(
     err,
     result
   ) {
-    res.send(result);
+    Books.findOne(id).then(responce => {
+      var checkedoutBook = {
+        email: req.params.user,
+        book_id: responce._id,
+        book_title: responce.title
+      };
+      Checkout.create(checkedoutBook)
+        .then(resp => {
+          res.status(200).send({ status: resp.book_title + " added" });
+        })
+        .catch(err => {
+          res.status(401).send(err + "  UnSuccessful");
+        });
+    });
+    res.json(result);
   });
 });
+
 app.post("/user/register", (req, res) => {
+  console.log(req.body);
+
   const user = {
     name: req.body.name,
     email: req.body.email,
@@ -101,5 +118,12 @@ app.post("/user/login", (req, res) => {
       res.status(401).send("error" + err);
     });
 });
+// app.get("checkout/:id", (req, res) => {
+//   var decoded = jwt.verify(
+//     req.headers["authorization"],
+//     process.env.SECRET_KEY
+//   );
+//   res.send(decoded);
 
+// });
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
