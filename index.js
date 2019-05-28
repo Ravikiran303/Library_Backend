@@ -73,7 +73,7 @@ app.post("/user/register", (req, res) => {
           });
       });
     } else {
-      res.json({ error: "already registered" });
+      res.json({ error: err });
     }
   });
 });
@@ -94,11 +94,11 @@ app.post("/user/login", (req, res) => {
         });
         res.send(token);
       } else {
-        res.json({ error: "User does not exist" });
+        res.status(401).json({ error: "User does not exist" });
       }
     })
     .catch(err => {
-      res.send("error" + err);
+      res.status(401).send("error" + err);
     });
 });
 
