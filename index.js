@@ -43,6 +43,14 @@ app.get("/books", (req, res) => {
     }
   });
 });
+app.post("/books", (req, responce) => {
+  const book = req.body;
+  Books.create(book).then(res => {
+    responce.json(res);
+  });
+
+  console.log(book);
+});
 app.put("/books/:id/checkout/:user", (req, res) => {
   var id = mongoose.Types.ObjectId(req.params.id);
   Books.updateOne({ _id: id }, { $set: { available: false } }, function(
