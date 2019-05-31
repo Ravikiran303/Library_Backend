@@ -65,13 +65,32 @@ app.put("/books/:id/checkout/:user", (req, res) => {
       };
       Checkout.create(checkedoutBook)
         .then(resp => {
-          res.status(200).send({ status: resp.book_title + " added" });
+          res.status(201).send({ status: resp.book_title + " added" });
         })
         .catch(err => {
           res.status(401).send(err + "  UnSuccessful");
         });
     });
     res.json(result);
+  });
+});
+app.put("/book/:id/return", (req, res) => {
+  var id = mongoose.Types.ObjectId(req.params.id);
+  Checkout.findOne(id).then(resp => {
+    //res.send(resp);
+    Books.updateOne(
+      { _id: resp.book_id },
+      { $set: { available: true } },
+      function(err, result) {
+        if (!result) {
+          res.status(200).json(result);
+        } else {
+          res.status(404).send("Not found");
+        }
+      }
+    ).catch(err => {
+      res.status(404).send(err + "Not listed");
+    });
   });
 });
 
@@ -126,12 +145,4 @@ app.post("/user/login", (req, res) => {
       res.status(401).send("error" + err);
     });
 });
-// app.get("checkout/:id", (req, res) => {
-//   var decoded = jwt.verify(
-//     req.headers["authorization"],
-//     process.env.SECRET_KEY
-//   );
-//   res.send(decoded);
-
-// });
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
